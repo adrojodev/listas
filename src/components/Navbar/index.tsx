@@ -1,9 +1,13 @@
-import { List } from "@phosphor-icons/react/dist/ssr";
+"use client";
+
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 import { Avatar, AvatarFallback } from "../ui/avatar";
-import { Button } from "../ui/button";
+import { MenuNavbarButton } from "./MenuNavbarButton";
 
 export const Navbar = () => {
+  const { user } = useUser();
+
   return (
     <nav className="w-full flex justify-between border border-input rounded-full p-1 gap-1">
       <button>
@@ -16,9 +20,7 @@ export const Navbar = () => {
         type="text"
         placeholder="Search"
       />
-      <Button size="icon" variant="secondary" className="shrink-0">
-        <List size={16} weight="bold" />
-      </Button>
+      <MenuNavbarButton />
     </nav>
   );
 };

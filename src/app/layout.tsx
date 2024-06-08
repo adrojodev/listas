@@ -1,8 +1,10 @@
-import type { Metadata } from "next";
 import {
   Poppins as SansFont,
   Playfair_Display as SerifFont,
 } from "next/font/google";
+import { UserProvider } from "@auth0/nextjs-auth0/client";
+import type { Metadata } from "next";
+
 import "./globals.css";
 
 const sansFont = SansFont({
@@ -27,7 +29,9 @@ export default function RootLayout({
 }>) {
   return (
     <html className={`${sansFont.variable} ${serifFont.variable}`} lang="en">
-      <body>{children}</body>
+      <UserProvider>
+        <body>{children}</body>
+      </UserProvider>
     </html>
   );
 }
