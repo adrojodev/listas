@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useFieldArray, useForm } from "react-hook-form";
 import { Plus, TrashSimple, X } from "@phosphor-icons/react/dist/ssr";
 
@@ -22,13 +23,20 @@ interface FormValues {
 }
 
 export default function CreatePage() {
+  const router = useRouter();
   const {
     register: formRegister,
     handleSubmit,
     formState,
   } = useForm<FormValues>();
 
-  const { register: itemsRegister, control: itemsControl } = useForm<ListItem>({
+  const {
+    register: itemsRegister,
+    control: itemsControl,
+    formState: itemsFormState,
+    getFieldState: getItemsFieldState,
+    getValues: getItemsValues,
+  } = useForm<ListItem>({
     defaultValues: { listItems: [{ title: "", text: "" }] },
   });
 
@@ -42,12 +50,20 @@ export default function CreatePage() {
   });
 
   const onSubmit = async (data: FormValues) => {
+    const itemsValues = getItemsValues().listItems;
+
+    if (itemsValues.length === 0) {
+      return;
+    }
+
     await createList({
       title: data.title,
       description: data.description,
       creatorId: "60f7b3b3b3b3b3b3b3b3b3b3",
       items: listItemsArray,
     });
+
+    router.push(APP_ROUTES.HOME);
   };
 
   return (
@@ -57,7 +73,16 @@ export default function CreatePage() {
         className="relative flex flex-col gap-4"
       >
         <header className="flex w-full justify-between">
-          <Button variant="outline" size="icon" asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            disabled={
+              formState.isSubmitting ||
+              itemsFormState.isSubmitting ||
+              itemsFormState.isLoading
+            }
+            asChild
+          >
             <Link href={APP_ROUTES.HOME}>
               <X />
             </Link>
@@ -73,7 +98,10 @@ export default function CreatePage() {
             <Input
               id="title"
               placeholder="Best food in México City"
-              {...formRegister("title")}
+              {...formRegister("title", {
+                required: true,
+                disabled: formState.isSubmitting,
+              })}
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -81,7 +109,10 @@ export default function CreatePage() {
             <Textarea
               id="description"
               placeholder="Find the best places to it in the whole city!"
-              {...formRegister("description")}
+              {...formRegister("description", {
+                required: true,
+                disabled: formState.isSubmitting,
+              })}
             />
           </div>
         </div>
@@ -94,6 +125,7 @@ export default function CreatePage() {
                 <input
                   {...itemsRegister(`listItems.${index}.title`, {
                     required: true,
+                    disabled: formState.isSubmitting,
                   })}
                   type="text"
                   placeholder="Title"
@@ -104,11 +136,13 @@ export default function CreatePage() {
                   className="px-2 text-sm bg-background outline-none placeholder:text-muted-foreground"
                   {...itemsRegister(`listItems.${index}.text`, {
                     required: true,
+                    disabled: formState.isSubmitting,
                   })}
                 />
               </div>
               {index !== 0 && (
                 <Button
+                  disabled={formState.isSubmitting}
                   onClick={() => removeListItem(index)}
                   size="icon"
                   variant="ghost"
@@ -122,6 +156,7 @@ export default function CreatePage() {
           </div>
         ))}
         <Button
+          disabled={formState.isSubmitting}
           onClick={() => appendListItem({ title: "", text: "" })}
           size="sm"
           variant="secondary"

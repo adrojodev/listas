@@ -32,12 +32,16 @@ export async function getList(id: string): Promise<{ data: List }> {
   }
 }
 
-export async function createList(list: ListResponse): Promise<{ data: List }> {
+export async function createList(list: ListResponse): Promise<boolean> {
   try {
     await connectDB();
     const creatorId = mongoose.Types.ObjectId.createFromHexString(
       list.creatorId
     );
+
+    if (!creatorId || !list.items?.length) {
+      throw new Error("Invalid creator ID or items list");
+    }
 
     const uncompleteData = await ListSchema.create({
       ...list,
@@ -50,13 +54,13 @@ export async function createList(list: ListResponse): Promise<{ data: List }> {
       uncompleteData._id as mongoose.Types.ObjectId
     );
 
-    const data = await ListSchema.findByIdAndUpdate(
+    await ListSchema.findByIdAndUpdate(
       uncompleteData._id,
       { items: listItemsData.data.map((item) => item._id) },
       { new: true }
     );
 
-    return { data };
+    return true;
   } catch (error: any) {
     throw new Error(error);
   }
