@@ -86,7 +86,6 @@ export async function deleteList(id: string): Promise<boolean> {
 
     return true;
   } catch (error) {
-    console.log("Something went wrong:", error);
-    return false;
+    throw new Error(`Error deleting list: ${error}`);
   }
 }

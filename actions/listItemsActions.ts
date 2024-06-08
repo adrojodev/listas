@@ -51,7 +51,6 @@ export async function createListItems(
 ): Promise<{ data: ListItemIdentifier[] }> {
   try {
     await connectDB();
-    console.log({ items, listId });
     const data = await ListItemSchema.insertMany(
       items.map((item) => ({ ...item, listId: listId }))
     );
@@ -75,8 +74,7 @@ export async function updateListItem(
 
     return true;
   } catch (error) {
-    console.log("Something went wrong:", error);
-    return false;
+    throw new Error(`Error updating list item: ${error}`);
   }
 }
 
@@ -87,7 +85,6 @@ export async function deleteListItem(id: string) {
 
     return true;
   } catch (error) {
-    console.log("Something went wrong:", error);
-    return false;
+    throw new Error(`Error deleting list item: ${error}`);
   }
 }

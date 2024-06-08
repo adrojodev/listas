@@ -5,8 +5,6 @@ import { CreateButton } from "@/components/CreateButton";
 export default async function Home() {
   const lists = await getLists();
 
-  console.log({ lists });
-
   return (
     <main className="bg-background flex flex-col pt-2 px-2 gap-4">
       <Navbar />

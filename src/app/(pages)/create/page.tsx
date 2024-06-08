@@ -42,14 +42,12 @@ export default function CreatePage() {
   });
 
   const onSubmit = async (data: FormValues) => {
-    const newList = await createList({
+    await createList({
       title: data.title,
       description: data.description,
       creatorId: "60f7b3b3b3b3b3b3b3b3b3b3",
       items: listItemsArray,
     });
-
-    console.log({ newList });
   };
 
   return (
